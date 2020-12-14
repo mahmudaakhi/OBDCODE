@@ -2,15 +2,18 @@ package com.akhi.obdcodeerror;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,13 +44,25 @@ public class Home  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        getSupportActionBar().hide();
+       // getSupportActionBar().hide();
+
+
+        //Active Search Interface----------
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+        {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+            Intent intent1=new Intent(Home.this,SearchDetailActivity.class);
+            intent.putExtra("query",query);
+            startActivity(intent1);
+        }
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-//Retrofit.....
+//---------------Retrofit.....---------------
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -80,11 +95,13 @@ public class Home  extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tool, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) tool.findItem(R.id.search).getActionView();
+        MenuItem menuItem = menu.findItem(R.id.search);
+        //  SearchView searchView = (SearchView) tool.(R.id.search).getActionView();
+        SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      //  searchView.setIconifiedByDefault(false);
+        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 fetchContact("users", query);
@@ -99,7 +116,7 @@ public class Home  extends AppCompatActivity {
                 fetchContact("users", newText);
                 return false;
             }
-        });
+        });*/
         return true;
     }
 }
